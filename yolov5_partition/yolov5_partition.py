@@ -27,15 +27,7 @@ colors = Colors()
 
 class yolov5():
     def __init__(self, onnx_path, confThreshold=0.25, nmsThreshold=0.45):
-        self.classes = ['figue','annotation','title','title bar','draw','person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
-        'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
-        'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
-        'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
-        'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
-        'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
-        'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
-        'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
-        'hair drier', 'toothbrush']
+        self.classes = ['figue','annotation','title','title bar','draw']
         self.colors = [np.random.randint(0, 255, size=3).tolist() for _ in range(len(self.classes))]
         num_classes = len(self.classes)
         self.anchors = [[10, 13, 16, 30, 33, 23], [30, 61, 62, 45, 59, 119], [116, 90, 156, 198, 373, 326]]
@@ -206,54 +198,18 @@ class yolov5():
 
 def mult_test(onnx_path, img_dir, save_root_path, video=False):
     model = yolov5(onnx_path)
-    if video:
-        cap = cv2.VideoCapture(0)
-        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        fps = cap.get(cv2.CAP_PROP_FPS)       #视频平均帧率
-        size = (frame_height,frame_width)     #尺寸和帧率和原视频相同
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        out = cv2.VideoWriter('zi.mp4',fourcc,fps,size)
-        while cap.isOpened():
-            ok, frame = cap.read()
-            if not ok:
-                break
-            frame = model.detect(frame)
-            out.write(frame)
-            cv2.imshow('result', frame)
-            c = cv2.waitKey(1) & 0xFF
-            if c==27 or c==ord('q'):
-                break
-        cap.release()
-        out.release()
-        cv2.destroyAllWindows()
-    else:
-        if not os.path.exists(save_root_path):
-            os.mkdir(save_root_path)
-        for root, dir, files in os.walk(img_dir):
-            for file in files:
-                image_path = os.path.join(root, file)
-                save_path = os.path.join(save_root_path, file)
-                if "mp4" in file or 'avi' in file:
-                    cap = cv2.VideoCapture(image_path)
-                    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                    fps = cap.get(cv2.CAP_PROP_FPS)        
-                    size = (frame_width, frame_height)     
-                    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-                    out = cv2.VideoWriter(save_path,fourcc,fps,size)
-                    while cap.isOpened():
-                        ok, frame = cap.read()
-                        if not ok:
-                            break
-                        frame = model.detect(frame)
-                        out.write(frame)
-                    cap.release()
-                    out.release()
-                    print("  finish:   ", file)
-                elif 'jpg' or 'png' in file:
-                    srcimg = cv2.imread(image_path)
-                    srcimg = model.detect(srcimg)
-                    print("  finish:   ", file)
-                    cv2.imwrite(save_path, srcimg)
+   
+    
+    if not os.path.exists(save_root_path):
+        os.mkdir(save_root_path)
+    for root, dir, files in os.walk(img_dir):
+        for file in files:
+            image_path = os.path.join(root, file)
+            save_path = os.path.join(save_root_path, file)
+            
+            
+            srcimg = cv2.imread(image_path)
+            srcimg = model.detect(srcimg)
+            print("  finish:   ", file)
+            cv2.imwrite(save_path, srcimg)
 
